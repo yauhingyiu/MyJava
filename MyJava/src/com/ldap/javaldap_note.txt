@@ -1,0 +1,17 @@
+
+
+keytool -delete -noprompt -alias ${cert.alias}  -keystore ${keystore.file} 
+
+keytool -delete -alias dstest.der -keystore C:\Users\a578700\Desktop\ldapcert\ -storepass Oracle123
+
+keytool -importcert -file C:\Users\a578700\Desktop\dstest.der -alias dstest.der -keystore C:\Users\a578700\Desktop\ldapcert\
+
+
+keytool -importcert -file C:\Users\a578700\Desktop\dstest.der -alias dstest.der -keystore "C:\Program Files\Java\jdk1.8.0_131\jre\lib\security\cacerts" -storepass changeit
+
+
+get cert
+http://blog.icodejava.com/tag/get-public-key-of-ssl-certificate-in-java/
+
+
+unable to find valid certification path to requested target
