@@ -138,11 +138,11 @@ public class LdapSearch {
 			NamingEnumeration<SearchResult> list = findAccount(ctx, 
 					ldapSearchBase, searchKeyword);
 			
-			listResult( list );
+			listResultCsv( list );
 			
 			
 			// modify attributes
-			//*
+			/*
 		    {
 		    	List<String> attributeNames = new ArrayList<String>(); 
 		    	List<String> attributeValues = new ArrayList<String>();
