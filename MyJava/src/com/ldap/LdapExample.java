@@ -1,24 +1,15 @@
 package com.ldap;
 
-/*
- * how to setup:
- * 
- * 1. import cert first: (default password is changeit)
- * keytool -importcert -file C:\Users\a578700\Desktop\dstest.der -alias dstest.der -keystore "C:\Program Files\Java\jdk1.8.0_131\jre\lib\security\cacerts" -storepass changeit
- * 
- * 
- * */
-
-import java.io.File;
 import java.util.Hashtable;
-import java.util.List;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
@@ -36,7 +27,8 @@ public class LdapExample {
 		final String ldapUsername = "uid=37b7fe15-dd1d-42c5-b91e-a7eae9297115, dc=cuhk, dc=edu, dc=hk";
 		final String ldapPassword = "Ymy2ms5W";
 		
-		final String ldapAccountToLookup = "(|(universityid=ddz044071)(universityid=ddz044072)(universityid=ddz044073)(universityid=ddz044074))";
+		//final String ldapAccountToLookup = "(|(universityid=ddz044071)(universityid=ddz044072)(universityid=ddz044073)(universityid=ddz044074))";
+		final String ldapAccountToLookup = "(|(universityid=ddz044071))";
 		
 		try
 		{
@@ -91,6 +83,18 @@ public class LdapExample {
 					ldapSearchBase, ldapAccountToLookup);
 			
 			listResult( list );
+			
+			
+			// modify attributes
+			ModificationItem[] mods = new ModificationItem[1];
+
+		    Attribute mod0 = new BasicAttribute("visible", "yes");
+		    //Attribute mod1 = new BasicAttribute("number2", "AAA");
+
+		    mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, mod0);
+		    //mods[1] = new ModificationItem(DirContext.ADD_ATTRIBUTE, mod1);
+
+		    ctx.modifyAttributes("uid=304f8d81-5bce11e7-80babd7d-ae3f753a,dc=cuhk,dc=edu,dc=hk", mods);
 		}
 		catch(Exception e)
 		{
@@ -118,7 +122,7 @@ public class LdapExample {
 		{
 			searchResult = (SearchResult) results.nextElement();
 			System.out.println("============ record "+i+" ============");
-			
+			System.out.println( searchResult.getNameInNamespace() );
 			Attributes attrs = searchResult.getAttributes();
 			NamingEnumeration enumer = attrs.getAll();
 			Attribute attrObj;
@@ -127,6 +131,7 @@ public class LdapExample {
 				attrObj = (Attribute)enumer.next();
 				//System.out.println( "attr: "+attrObj.getClass().getName() );
 				//System.out.println( "attr: "+attrObj );
+				
 				System.out.print( "name: "+attrObj.getID()+", " );
 				System.out.println( "value: "+attrObj.get() );
 				//System.out.println( "attr: "+(attrObj instanceof javax.naming.directory.Attribute) );
