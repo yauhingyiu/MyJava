@@ -48,7 +48,7 @@ public class LdapSearch {
 	{
 		//final String ldapAccountToLookup = "(|(universityid=ddz044071)(universityid=ddz044072)(universityid=ddz044073)(universityid=ddz044074))";
 		String ldapSettingSet = "dstest";
-		String searchKeyword = "(|(universityid=ddz044071))";
+		String searchKeyword = "(|(deptcode=itsc))";
 		if(args.length>0)
 		{
 			if(args[0]!=null)
@@ -229,7 +229,7 @@ public class LdapSearch {
 	{
 		Calendar cal = Calendar.getInstance();
 		
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(SDF_1.format(cal.getTime())+"_ldapSearch.csv"), "utf8"));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("D:\\Documents\\temp\\"+SDF_1.format(cal.getTime())+"_ldapSearch.csv"), "utf8"));
 		String csvCaption = "nameInNameSpace";
 		int i = 1;
 		SearchResult searchResult = null;
