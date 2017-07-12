@@ -30,6 +30,7 @@ public class LdapExample {
 		//final String ldapAccountToLookup = "(|(universityid=ddz044071)(universityid=ddz044072)(universityid=ddz044073)(universityid=ddz044074))";
 		final String ldapAccountToLookup = "(|(universityid=ddz044071))";
 		
+		LdapContext ctx = null;
 		try
 		{
 			Hashtable<String, Object> env = new Hashtable<String, Object>();
@@ -75,7 +76,7 @@ public class LdapExample {
 					"objectclass"
 				} );
 			
-			LdapContext ctx = new InitialLdapContext( env, null );
+			ctx = new InitialLdapContext( env, null );
 
 			LdapExample ldap = new LdapExample();
 			
@@ -99,6 +100,19 @@ public class LdapExample {
 		catch(Exception e)
 		{
 			e.printStackTrace();
+		}
+		finally
+		{
+			try
+			{
+				if(ctx!=null)
+				{
+					ctx.close();
+				}
+			}
+			catch(Exception e)
+			{
+			}
 		}
 		System.out.println("LdapExample exit");
 	}

@@ -113,17 +113,12 @@ public class LdapSearch {
 	public void run(Hashtable<String, Object> env, String searchKeyword)
 	{
 
-		
+		LdapContext ctx = null;
 		try
 		{
 			System.out.println("java home: "+System.getProperty("java.home"));
 			System.setProperty("javax.net.ssl.keyStore", JAVA_HOME+"\\jre\\lib\\security\\cacerts");
 			System.setProperty("javax.net.ssl.trustStore", JAVA_HOME+"\\jre\\lib\\security\\cacerts");
-			
-			
-			
-			
-			
 			
 			SearchControls ctls = new SearchControls();
 			ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -133,7 +128,7 @@ public class LdapSearch {
 					"objectclass"
 				} );
 			
-			LdapContext ctx = new InitialLdapContext( env, null );
+			ctx = new InitialLdapContext( env, null );
 
 			NamingEnumeration<SearchResult> list = findAccount(ctx, 
 					ldapSearchBase, searchKeyword);
@@ -160,6 +155,19 @@ public class LdapSearch {
 		catch(Exception e)
 		{
 			e.printStackTrace();
+		}
+		finally
+		{
+			try
+			{
+				if(ctx!=null)
+				{
+					ctx.close();
+				}
+			}
+			catch(Exception e)
+			{
+			}
 		}
 		System.out.println("LdapExample exit");
 	}
