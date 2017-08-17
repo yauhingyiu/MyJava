@@ -65,7 +65,7 @@ public class HttpsPostExample
 			connection.setDoOutput(true);
 			{
 				String[] approve = {
-					"yes", "yes", "yes", "yes", "yes"
+					"", "yes", "yes", "yes", "yes"
 				};
 				String[] appNo = {
 						"170613-023", "170613-024", "170613-025", "170613-026", "170613-027"

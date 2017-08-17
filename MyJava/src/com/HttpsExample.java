@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -59,7 +60,9 @@ public class HttpsExample
 			
 			URL url = new URL("https://portal.cuhk.edu.hk/psp/epprd/?cmd=login&languageCd=ENG&");
 			//System.out.println(url.openConnection().getClass());
-			HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+			URLConnection connection = url.openConnection();
+			
+			//HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
 			InputStream is = connection.getInputStream();
 			BufferedReader br = new BufferedReader( new InputStreamReader( new BufferedInputStream( is ) ) );
 			String tmp;
