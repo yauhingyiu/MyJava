@@ -1,3 +1,12 @@
+/**
+ * UAT
+ * java -cp /product/asl/oimservice/WEB-INF/lib/authwl.jar:/product/asl/oimservice/WEB-INF/lib/commons-logging.jar--:/product/asl/oimservice/WEB-INF/lib/eclipselink.jar--:/product/asl/oimservice/WEB-INF/lib/jrf-api.jar:/product/asl/oimservice/WEB-INF/lib/jstl-1.2.jar--:/product/asl/oimservice/WEB-INF/lib/oimclient.jar:/product/asl/oimservice/WEB-INF/lib/oimservice.jar:/product/asl/oimservice/WEB-INF/lib/spring.jar--:/product/asl/oimservice/WEB-INF/lib/wlfullclient.jar--:/product/asl/oimservice/WEB-INF/lib/xlUtils.jar:/home/oracle:. com.util.OimUserUtil DDZ044555
+ * 
+ * PRD
+ * java -cp /product/asl/oimservice/WEB-INF/lib/authwl.jar:/product/asl/oimservice/WEB-INF/lib/jrf-api.jar:/product/asl/oimservice/WEB-INF/lib/oimclient.jar:/product/asl/oimservice/WEB-INF/lib/wlfullclient.jar.ORG:/product/asl/oimservice/WEB-INF/lib/oimservice.jar:/product/fmw/11g/Oracle_IDM1/designconsole/ext/spring.jar:/product/asl/oimservice/WEB-INF/lib/xlUtils.jar:/product/fmw/11g/Oracle_IDM1/designconsole/ext/commons-logging.jar:/home/oracle:. com.util.OimUserUtil XELSYSADM
+ * 
+ * */
+
 package com;
 
 import java.security.InvalidKeyException;
@@ -17,11 +26,13 @@ public class StringEncryption {
 
 		try {
 			
-			String msg = "This is a message.";
+			String msg = "RF3y9up#";
 
 			String e = encryptAes128( msg );
 			System.out.println("encrypted: " + e );
 			System.out.println("decrypted: " + decryptAes128( e ) );
+			
+			System.out.println( decryptAes128("==") );
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
