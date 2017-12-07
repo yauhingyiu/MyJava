@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -51,6 +52,7 @@ public class HttpsPostExample
 			
 			try {
 				SSLContext sc = SSLContext.getInstance("TLS");
+				//SSLContext sc = SSLContext.getInstance("SSL");
 				sc.init(null, trustAllCerts, new java.security.SecureRandom());
 				HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 			} catch (Exception e) {
@@ -58,22 +60,32 @@ public class HttpsPostExample
 			//*/
 			
 			
-			URL url = new URL("https://uidms1.itsc.cuhk.edu.hk:15001/oimservice/updateApproveByAppNo");
+			//URL url = new URL("https://identity.itsc.cuhk.edu.hk:7778/oimservice/updateApproveByAppNo");
+			//URL url = new URL("https://uidms1.itsc.cuhk.edu.hk:15001/oimservice/updateApproveByAppNo");
+			URL url = new URL("http://didms1.itsc.cuhk.edu.hk:15000/oimservice/updateApproveByAppNo");
 			
-			HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+			//HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("POST");
 			connection.setDoOutput(true);
 			{
 				String[] approve = {
-					"", "yes", "yes", "yes", "yes"
+					"yes", "yes", "yes", "yes", "yes",
+					"yes", "yes", "yes", "yes", "yes"
+					, "yes", "yes"
 				};
+				String appNoDate = "170918";
 				String[] appNo = {
-						"170613-023", "170613-024", "170613-025", "170613-026", "170613-027"
-					};
+					appNoDate+"-000",
+					/*
+					"170413-015",
+//*/
+				};
 				StringBuffer sbParam = new StringBuffer("a=");
-				for(int i = 0;i<approve.length;i++)
+				for(int i = 0;i<appNo.length;i++)
 				{
-					sbParam.append("&approve[]="+approve[i]+"&appNo[]="+appNo[i]);
+					//sbParam.append("&approve[]="+approve[i]+"&appNo[]="+appNo[i]);
+					sbParam.append("&approve[]=no&appNo[]="+appNo[i]);
 				}
 				DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
 			    wr.writeBytes(sbParam.toString());
