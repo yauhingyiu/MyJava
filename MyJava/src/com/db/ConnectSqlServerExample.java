@@ -16,8 +16,9 @@ public class ConnectSqlServerExample {
 		Connection conn = null;
 		try
 		{
-			conn = getConn("cow.itsc.cuhk.edu.hk", 5000,
-				"hingyiu_itsc", "yau@2017");
+			//conn = getConn("logkeeper.itsc.cuhk.edu.hk", 5000, "hingyiu_itsc", "hing#0518yiu", "IAM_DEV_DB");
+			
+			conn = getConn("bee-sql.itsc.cuhk.edu.hk", 1433, "hyyau_itsc", "qgaxQk4tOig65yOO", "ARMS_PRD_DB");
 			//assignComputingID(conn);
 			
 		}
@@ -41,13 +42,13 @@ public class ConnectSqlServerExample {
 		}
 	}
 	
-	public Connection getConn(String host, int port, String username, String password)
+	public Connection getConn(String host, int port, String username, String password, String database)
 	{
 		Connection conn = null;
 		try
 		{
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			conn = DriverManager.getConnection("jdbc:sqlserver://cow.itsc.cuhk.edu.hk:5000;databaseName=IAM_DEV_DB", 
+			conn = DriverManager.getConnection("jdbc:sqlserver://"+host+":"+port+";databaseName="+database, 
 				username, password );
 			
 			System.out.println("conn==null? "+(conn==null));
