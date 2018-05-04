@@ -29,6 +29,10 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
+/*
+ * for active directory, ldap user name = userPrincipalName
+ * 
+ * */
 public class LdapSearch {
 
 	public static final String JAVA_HOME = "C:\\Program Files\\Java\\jdk1.8.0_131";
@@ -42,13 +46,26 @@ public class LdapSearch {
 	private String ldapPassword = "";
 	
 	private boolean useSsl;
-	private LdapContext ctx;
+	//private LdapContext ctx;
 	
 	public static void main(String[] args)
 	{
+		String ldapUsername = null;
+		String ldapPassword = null;
 		//final String ldapAccountToLookup = "(|(universityid=ddz044071)(universityid=ddz044072)(universityid=ddz044073)(universityid=ddz044074))";
-		String ldapSettingSet = "dstest";
-		String searchKeyword = "(|(deptcode=itsc))";
+		String ldapSettingSet = "prdad";
+		//ldapUsername = "77100000127@connect.itsc.cuhk.edu.hk";
+		//ldapUsername = "uid=496e5181-059611e8-80babd7d-ae3f753a,dc=cuhk, dc=edu, dc=hk";
+		//ldapUsername = "1007008630@link.cuhk.edu.hk";
+		//ldapUsername = "uid=ece20781-4c5411e8-80babd7d-ae3f753a,dc=cuhk,dc=edu,dc=hk";
+		//ldapPassword = "pjacct#test1";
+		//ldapPassword = "8wikw7&&";
+		String searchKeyword = "(|(mail=wilson.ng@link.cuhk.edu.hk)(mail=sphpc_ug@cuhk.edu.hk))";
+		//searchKeyword = "(|(mail=dda1000090@cuhk.edu.hk)(mail=dda1000100@cuhk.edu.hk))";
+		searchKeyword = "(|(universityid=8888844))";
+		searchKeyword = "(|(universityid=a484700))";
+		//searchKeyword = "(|(universityid=1155117722))";
+
 		if(args.length>0)
 		{
 			if(args[0]!=null)
@@ -61,15 +78,16 @@ public class LdapSearch {
 			}
 		}
 		
-		new LdapSearch( ldapSettingSet, searchKeyword );
+		new LdapSearch( ldapSettingSet, searchKeyword, true, ldapUsername, ldapPassword );
 	}
 	
-	public LdapSearch(String ldapSettingSet, String searchKeyword)
+	public LdapSearch(String ldapSettingSet, String searchKeyword, boolean writeFile,
+			String overrideLdapUsername, String overrideLdapPassword)
 	{
 		System.out.println("host="+res.getString(ldapSettingSet+".host"));
 		System.out.println("searchbase="+res.getString(ldapSettingSet+".searchbase"));
-		System.out.println("username="+res.getString(ldapSettingSet+".username"));
-		System.out.println("password="+res.getString(ldapSettingSet+".password"));
+		//System.out.println("username="+res.getString(ldapSettingSet+".username"));
+		//System.out.println("password="+res.getString(ldapSettingSet+".password"));
 		System.out.println("ssl="+res.getString(ldapSettingSet+".ssl"));
 		
 		ldapAdServer = res.getString(ldapSettingSet+".host");
@@ -77,6 +95,15 @@ public class LdapSearch {
 		ldapUsername = res.getString(ldapSettingSet+".username");
 		ldapPassword = res.getString(ldapSettingSet+".password");
 		useSsl = "yes".equals(res.getString(ldapSettingSet+".ssl"));
+		
+		if(overrideLdapUsername!=null)
+		{
+			ldapUsername = overrideLdapUsername;
+		}
+		if(overrideLdapPassword!=null)
+		{
+			ldapPassword = overrideLdapPassword;
+		}
 		
 		Hashtable<String, Object> env = new Hashtable<String, Object>();
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
@@ -103,14 +130,17 @@ public class LdapSearch {
 		//ensures that objectSID attribute values
 		//will be returned as a byte[] instead of a String
 		env.put("java.naming.ldap.attributes.binary", "objectSID");
+		env.put("java.naming.ldap.attributes.binary", "objectGUID");
+		//Security.addProvider(new BouncyCastleProvider());
 		
 		// the following is helpful in debugging errors
 		//env.put("com.sun.jndi.ldap.trace.ber", System.err);
 		
-		run( env, searchKeyword );
+		run( env, searchKeyword, ldapSettingSet, writeFile );
 	}
 	
-	public void run(Hashtable<String, Object> env, String searchKeyword)
+	public void run(Hashtable<String, Object> env, 
+			String searchKeyword, String ldapSettingSet, boolean writeFile)
 	{
 
 		LdapContext ctx = null;
@@ -119,6 +149,7 @@ public class LdapSearch {
 			System.out.println("java home: "+System.getProperty("java.home"));
 			System.setProperty("javax.net.ssl.keyStore", JAVA_HOME+"\\jre\\lib\\security\\cacerts");
 			System.setProperty("javax.net.ssl.trustStore", JAVA_HOME+"\\jre\\lib\\security\\cacerts");
+			//System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
 			
 			SearchControls ctls = new SearchControls();
 			ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -130,23 +161,41 @@ public class LdapSearch {
 			
 			ctx = new InitialLdapContext( env, null );
 
+			//GetADGUID(ctx, ldapSearchBase, "1008013550");
+			//GetADGUID(ctx, ldapSearchBase, "603149");
+			/*
+			removeProxyAddress(ctx,
+					"CN=1a0eff81-4e7911e8-80babd7d-ae3f753a,OU=OtherAccounts,OU=People,DC=uad,DC=cuhk,DC=edu,DC=hk",
+					"smtp:dda1000700@mailserv.cuhk.edu.hk"
+			);
+			removeProxyAddress(ctx,
+					"CN=1a0eff81-4e7911e8-80babd7d-ae3f753a,OU=OtherAccounts,OU=People,DC=uad,DC=cuhk,DC=edu,DC=hk",
+					"SMTP:dda1000700@cuhk.edu.hk"
+			);
+			//*/
+			
+			//*
 			NamingEnumeration<SearchResult> list = findAccount(ctx, 
 					ldapSearchBase, searchKeyword);
 			
-			listResultCsv( list );
+			listResultCsv( list, ldapSettingSet, true, writeFile );
+			//*/
 			
+			//ModificationItem[] mods = new ModificationItem[1];
+			//mods[0]=new ModificationItem(DirContext.ADD_ATTRIBUTE,new BasicAttribute("proxyAddresses", "SMTP:zbb040045@cuhk.edu.hk"));
+			//ctx.modifyAttributes("CN=Tai Man Chan - 045,OU=BUR,OU=BurAdm,OU=Staff,OU=People,DC=uad,DC=cuhk,DC=edu,DC=hk", mods);
 			
 			// modify attributes
 			/*
 		    {
 		    	List<String> attributeNames = new ArrayList<String>(); 
 		    	List<String> attributeValues = new ArrayList<String>();
-		    	attributeNames.add("mailalias");
-		    	attributeValues.add("ddz044071@cuhk.edu.hk");
-		    	//attributeNames.add("userPassword");
-		    	//attributeValues.add("99999999");
+		    	//attributeNames.add("displayName");
+		    	//attributeValues.add("Kei Man Tam  (EMO)44");
+		    	attributeNames.add("userPassword");
+		    	attributeValues.add("99999999");
 		    	modifyAttr( ctx, 
-			    		"uid=304f8d81-5bce11e7-80babd7d-ae3f753a,dc=cuhk,dc=edu,dc=hk", 
+			    		"CN=Tam Kei Man - 084,OU=EMO,OU=EmoAdm,OU=Staff,OU=People,DC=adtest,DC=cuhk,DC=edu,DC=hk", 
 			    		attributeNames, attributeValues);
 		    }
 		    //*/
@@ -231,17 +280,37 @@ public class LdapSearch {
 			}
 			i++;
 		}
+		
+		
 	}
 	
-	public static void listResultCsv(NamingEnumeration<SearchResult> results) throws NamingException, IOException
+	public static void listAttrs(NamingEnumeration enumer, String attrName) throws NamingException
+	{
+		//System.out.println("listAttrs ");
+		Attribute attrObj;
+		String s;
+		while( enumer.hasMore() )
+		{
+			//attrObj = (Attribute)enumer.next();
+			s = (String)enumer.next();
+			//System.out.print( "name: "+attrObj.getID()+", " );
+			//System.out.println( "value: "+attrObj.get() );
+			System.out.println( attrName + " = " + s );
+			
+			
+		}
+	}
+	
+	public static void listResultCsv(NamingEnumeration<SearchResult> results, 
+			String ldapSettingSet, boolean printProperties, boolean writeFile) throws NamingException, IOException
 	{
 		Calendar cal = Calendar.getInstance();
 		
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("D:\\Documents\\temp\\"+SDF_1.format(cal.getTime())+"_ldapSearch.csv"), "utf8"));
-		String csvCaption = "nameInNameSpace";
+		
+		//String csvCaption = "nameInNameSpace";
 		int i = 1;
 		SearchResult searchResult = null;
-		StringBuffer sbValue;
+		//StringBuffer sbValue;
 		
 		int captionSeq = 0;
 		
@@ -261,6 +330,7 @@ public class LdapSearch {
 			//sbValue = new StringBuffer( "\""+searchResult.getNameInNamespace()+"\"" );
 			captionValue = new TreeMap<String, Object>();
 			captionValue.put("nameInNameSpace", searchResult.getNameInNamespace() );
+			
 			while( enumer.hasMore() )
 			{
 				attrObj = (Attribute)enumer.next();
@@ -271,50 +341,132 @@ public class LdapSearch {
 				}
 				
 				captionValue.put(attrObj.getID(), attrObj.get());
-				System.out.print( "name: "+attrObj.getID()+", " );
-				System.out.println( "value: "+attrObj.get() );
+				if(printProperties && (
+						"memberOf".equals(attrObj.getID()) ||
+						"proxyAddresses".equals(attrObj.getID())
+						))
+				{
+					listAttrs( attrObj.getAll(), attrObj.getID() );
+				}
+				else if(printProperties && (
+						"objectGUID".equals(attrObj.getID()) 
+						
+					)
+				)
+				{
+					byte[] guid = (byte[]) attrObj.get(0);
+					//System.out.println( attr.get(0).getClass() );
+					System.out.println( ""+attrObj.getID()+" = "+toHexString(guid) );
+				}
+				else if( printProperties )
+				{
+					System.out.println( ""+attrObj.getID()+" = "+attrObj.get() );
+				}
 				
 			}
 			captionValueList.add(captionValue);
 			i++;
 		}
 		
-		// write caption
+		if(writeFile)
 		{
-			Set<Entry<String, Integer>> entrySet = captionMap.entrySet();
-			Iterator<Entry<String, Integer>> iter = entrySet.iterator();
-			bw.write( "nameInNameSpace" );
-			while(iter.hasNext())
-			{
-				bw.write( ","+iter.next().getKey() );
-			}
-			bw.newLine();
-		}
-		
-		// write data
-		for(Map<String, Object> captionValue2: captionValueList)
-		{
-			bw.write("\""+captionValue2.get("nameInNameSpace").toString()+"\"");
+			//captionMap.clear();
+			//captionMap.put("telephoneNumber", 1);
 			
-			Set<Entry<String, Integer>> entrySet = captionMap.entrySet();
-			Iterator<Entry<String, Integer>> iter = entrySet.iterator();
-			Object o;
-			while(iter.hasNext())
+			BufferedWriter bw = new BufferedWriter(
+					new OutputStreamWriter(new FileOutputStream("D:\\Documents\\temp\\"+SDF_1.format(cal.getTime())
+							+"_"+ldapSettingSet+"_search.csv"), "utf8"));
+			// write caption
 			{
-				o = captionValue2.get( iter.next().getKey() );
-				if(o==null)
+				Set<Entry<String, Integer>> entrySet = captionMap.entrySet();
+				Iterator<Entry<String, Integer>> iter = entrySet.iterator();
+				bw.write( "nameInNameSpace" );
+				while(iter.hasNext())
 				{
-					bw.write( ",");
+					bw.write( ","+iter.next().getKey() );
 				}
-				else
-				{
-					bw.write( ",\""+o.toString()+"\"");
-				}
+				bw.newLine();
 			}
-			bw.newLine();
 			
+			// write data
+			for(Map<String, Object> captionValue2: captionValueList)
+			{
+				bw.write("\""+captionValue2.get("nameInNameSpace").toString()+"\"");
+				
+				Set<Entry<String, Integer>> entrySet = captionMap.entrySet();
+				Iterator<Entry<String, Integer>> iter = entrySet.iterator();
+				Object o;
+				while(iter.hasNext())
+				{
+					o = captionValue2.get( iter.next().getKey() );
+					if(o==null)
+					{
+						bw.write( ",");
+					}
+					else
+					{
+						bw.write( ",\""+o.toString()+"\"");
+					}
+				}
+				bw.newLine();
+				
+			}
+	
+			bw.close();
 		}
+		// end if
+	}
+	
+	
+	public static void removeProxyAddress(DirContext dirContext, 
+			String userDn, String value) throws NamingException
+	{
+		ModificationItem[] mods = new ModificationItem[1];
+		mods[0]=new ModificationItem(DirContext.REMOVE_ATTRIBUTE,new BasicAttribute("proxyAddresses",value));
+		dirContext.modifyAttributes(userDn, mods);
+	}
+	
+	public String GetADGUID(DirContext dirContext, String searchBase, String universityId){
 
-		bw.close();
+		System.out.println("GetADGUID = "+ universityId);
+		String result="";
+		
+		
+		try{
+			String MY_FILTER = "(universityid="+universityId+")";
+
+			SearchControls constraints = new SearchControls();
+			constraints.setReturningAttributes(new String []{"objectGUID"});
+			constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+			NamingEnumeration results = dirContext.search(searchBase, MY_FILTER, constraints);
+
+			while (results != null && results.hasMore()) {
+				SearchResult sr = (SearchResult) results.next();
+				
+				Attributes attributes = sr.getAttributes();
+				Attribute attr = attributes.get("objectGUID");
+
+			    byte[] GUID = (byte[])attr.get();
+//System.out.print(Arrays.toString(GUID));			    
+				String objectGUID = toHexString(GUID);
+				System.out.println("objectGUID = "+objectGUID);
+				result = objectGUID;
+			}
+			return result;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "R";
+		}finally{
+
+		}
+	}
+	
+	private static String toHexString(byte[] inArr){
+	    StringBuffer guid = new StringBuffer();
+	    for (int i = 0; i < inArr.length; i++) {
+	      guid.append(Integer.toHexString(256 + (inArr[i] & 0xFF)).substring(1));
+	    }
+	    return guid.toString();
 	}
 }
